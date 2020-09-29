@@ -1,8 +1,8 @@
 """ This file stores all the global variables"""
 
-def variables():
-    flag = 1
-    hover_t=0;
-    fort_t=0;
-    backt_t=0;
-    cruise_t=0;
+def init():
+    global flag = 1
+    global hover_t=0;
+    global fort_t=0;
+    global backt_t=0;
+    global cruise_t=0;

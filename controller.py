@@ -1,12 +1,18 @@
 import numpy as np
+import globals
 class controller:
-    def __init__():
+    def __init__(self, t, state, des_state, BQ):
+        self.flag = globals.flag
+        self.t = t
+        self.state = state
+        self.des_state = des_state
+        self.BQ = BQ
         self.kr = np.identity(3)
         self.kw = np.identity(3)
         self.kp = np.identity(3)
         self.kv = np.identity(3)
     def control(self):
-        if(flag == 1):
+        if(self.flag == 1):
             self.kp(1,1)=25     #hover
             self.kp(2,2)=1
             self.kp(3,3)=40
@@ -20,7 +26,7 @@ class controller:
             self.kw(2,2)=70
             self.kw(3,3)=1
             
-        elif (flag==2):
+        elif (self.flag==2):
             self.kp(1,1)=0     #10      forward tran, kpx nt impacting 
             self.kp(2,2)=0
             self.kp(3,3)=300     #50
@@ -34,7 +40,7 @@ class controller:
             self.kw(2,2)=200     #if after some seconds the code is not working then change kw and kr. Make inner looprun faster
             self.kw(3,3)=1
     
-        elif (flag==3):
+        elif (self.flag==3):
             self.kp(1,1)=0
             self.kp(2,2)=1      #cruise
             self.kp(3,3)=20
@@ -48,7 +54,7 @@ class controller:
             self.kw(2,2)=500 #70
             self.kw(3,3)=1   
     
-        elif (flag==4):
+        elif (self.flag==4):
             self.kp(1,1)=5
             self.kp(2,2)=1    #backtrans
             self.kp(3,3)=1
@@ -62,7 +68,7 @@ class controller:
             self.kw(2,2)=200
             self.kw(3,3)=1
     
-        elif (flag==5):
+        elif (self.flag==5):
             self.kp(1,1)=5
             self.kp(2,2)=1     #land
             self.kp(3,3)=1
