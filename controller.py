@@ -88,7 +88,15 @@ class Controller:
             self.kw[2,2]=1
         
         ud = self.des_state.control
-        omega_curr=[[1, 0, -sin(self.state.rot(2))], [0, cos(self.state.rot(3)), cos(state.rot(2))*sin(state.rot(3))], [0, -sin(state.rot(3)), cos(state.rot(2))*cos(state.rot(3))]] * [[state.omega(1)], [state.omega(2)], [state.omega(3)]]
-        omega_des=[[1, 0, -sin(self.des_state.rot(2))], [0, cos(self.des_state.rot(3)), cos(self.des_state.rot(2))*sin(self.des_state.rot(3))], [0, -sin(des_state.rot(3)), cos(des_state.rot(2))*cos(des_state.rot(3))]] * [[des_state.omega(1)], [des_state.omega(2)], [des_state.omega(3)]]
+        
+        omega_curr=[[1, 0, -sin(self.state.rot(2))], 
+                             [0, cos(self.state.rot(3)), cos(state.rot(2))*sin(state.rot(3))], 
+                             [0, -sin(state.rot(3)), cos(state.rot(2))*cos(state.rot(3))]] * 
+                             [[state.omega(1)], [state.omega(2)], [state.omega(3)]] # check validity
+                             
+        omega_des=[[1, 0, -sin(self.des_state.rot(2))], 
+                            [0, cos(self.des_state.rot(3)), cos(self.des_state.rot(2))*sin(self.des_state.rot(3))], 
+                            [0, -sin(des_state.rot(3)), cos(des_state.rot(2))*cos(des_state.rot(3))]] * 
+                            [[des_state.omega(1)], [des_state.omega(2)], [des_state.omega(3)]] # check validity
 
         
