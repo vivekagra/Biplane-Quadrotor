@@ -1,0 +1,7 @@
+matplotlib
+numpy
+scipy
+slycot
+control
+gym
+torch
