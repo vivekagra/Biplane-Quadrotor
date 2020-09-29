@@ -1,15 +1,17 @@
 """ This file stores all the global variables"""
 
-def init():
-    global flag = 1
-    global hover_t=0
-    global fort_t=0
-    global backt_t=0
-    global cruise_t=0
+
+global flag
+global hover_t
+global fort_t
+global backt_t
+global cruise_t
+
+flag = 0
 
 
 class systemParameters():
-	def __init__:
+	def __init__():
 		self.m=12#%kg
 		self.g=9.81
 		self.rho = 1.225
