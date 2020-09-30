@@ -1,5 +1,6 @@
 from traj_gen import traj_gen
 from globals import flag as flag
+from globals import systemParameters
 
 flag = 3
 
@@ -24,6 +25,8 @@ traj_dot=[
                 0.585901796834056, 0.299863510269067, 0.123040818227709,0.0357850765749011,
                 0.00610735459558673, 0.000856677804326638, 0]
 
-x = traj_gen(traj,traj_dot)
+#x = traj_gen(traj,traj_dot)
+BQ = systemParameters()
+print(BQ.m)
 
 
