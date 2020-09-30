@@ -81,7 +81,7 @@ class Controller:
             self.kv[1,1]=1
             self.kv[2,2]=30
             self.kr[0,0]=1
-            self.kr[1,1]=70
+            self.kr[1,1]=70 
             self.kr[2,2]=1
             self.kw[0,0]=1
             self.kw[1,1]=1030
