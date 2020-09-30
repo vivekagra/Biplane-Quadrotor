@@ -1,3 +1,5 @@
+""" Function to convert Euler matrix to rotation"""
+
 from numpy import sin
 from numpy import cos
 

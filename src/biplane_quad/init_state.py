@@ -1,3 +1,5 @@
+""" Take Inital position, Initial Velocity, Initial Rotation, and Inital omega and merge them in a vector to return Initial State """
+
 import numpy as np
 
 def init_state(start_pos,start_vel,start_rot,start_omega):
