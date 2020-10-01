@@ -47,4 +47,3 @@ def time_traj_hover(t,s):
             hover_y=s.pos[1]
         else:
             return
-        

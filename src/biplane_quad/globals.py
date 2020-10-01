@@ -37,6 +37,9 @@ hover_x = 0
 hover_y = 0
 hover_z = 0
 
+global max_time
+max_time = 0
+
 
 class systemParameters:
 	def __init__(self):
