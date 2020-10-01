@@ -1,6 +1,7 @@
 from globals import hover_t, fort_t, flag, fort_x, fort_y, fort_z
 from utils import traj_gen
 from utils import desired_state
+import numpy as np
 
 def time_traj_fortrans(t,s):
     """ coeffx=[[0], [0], [-0.0147216079753913], [
@@ -188,63 +189,80 @@ def time_traj_fortrans(t,s):
     coeffz = traj_gen(z_traj, zdot_traj)
 
     if (t>(Tf+hover_t) and len(s)>0):
-        flag=3
+        flag = 3
         fort_t=t
-        fort_z=s.pos(2)
-        fort_x=s.pos(0)
-        fort_y=s.pos(1)
+        fort_z=s.pos[2]
+        fort_x=s.pos[0]
+        fort_y=s.pos[1]
         
-    t1 = norm(t-hover_t)
+    t1 = np.linalg.norm(t-hover_t)
 
     if t1>3.1:
         t1=3.1
     
-    time=[[1], [t1], [t1**2], [t1**3]]      # for cubic spline
+    time=[[1], [t1], [t1**2], [t1**3]]      # for cubic spline # 4x1 array
     n=4
     
     
     #Tf = 3.580993433738394
     h=Tf/30
     if t1==0:
-        j=1
+        j=0
     else:
-        j=ceil(t1/h)
+        j=np.ceil(t1/h) - 1 # """ check validity  """
     
-    x = coeffx[n*(j-1) : 4+n*(j-1)].T * time
-    xdot=(coeffx((2:4)+n*(j-1)))'*[12*t13*t1^2]
-    xddot=(coeffx((3:4)+n*(j-1)))'*[26*t1]
+    x = coeffx[n*(j) : 4+n*(j)] # 4x1 array
+    x = np.transpose(x)
+    x = np.dot(x,time)
     
-    time_new=t1
+    xdot = coeffx[1+n*(j) : 4+n*(j)] # 4x1 array
+    xdot = np.transpose(xdot)
+    xdot = np.dot(xdot,np.array[[1], [2*t1], [3*(t1**2)]])
     
-    theta_lim=[theta_traj(j) theta_traj(j+1)]      %linear interpol of theta
-    time_lim=[(j-1) j]*h
-    thetad=interp1(time_lim, theta_lim, time_new)
-    phid=0
-    psid=0
+    xddot = coeffx[2+n*(j) : 4+n*(j)] # 4x1 array
+    xddot = np.transpose(xddot)
+    xddot = np.dot(xddot,np.array[[2], [6*t1]])
     
-    thetadot_lim=[thetadot_traj(j) thetadot_traj(j+1)]      %linear interpol of thetadot
-    thetadot_des=interp1(time_lim, thetadot_lim, time_new)
-    phidot_des=0
-    psidot_des=0
+    time_new = t1
     
-    Tfwd_lim=[Tfwd_traj(j) Tfwd_traj(j+1)]      %linear interpol of feed forward thrust
-    Tfwd=interp1(time_lim, Tfwd_lim, time_new)
+    theta_lim = [theta_traj[j], theta_traj[j+1]]      #linear interpol of theta
+    time_lim = [j, j+1]*h
+    thetad = np.interp(time_lim, theta_lim, time_new)
+    phid = 0
+    psid = 0
     
-    Mfwd_lim=[Mfwd_traj(j) Mfwd_traj(j+1)]      %linear interpol of feed forward thrust
-    Mfwd=interp1(time_lim, Mfwd_lim, time_new)
+    thetadot_lim = [thetadot_traj[j], thetadot_traj[j+1]]      #linear interpol of thetadot
+    thetadot_des = np.interp(time_lim, thetadot_lim, time_new)
+    phidot_des = 0
+    psidot_des = 0
     
-    z = (coeffz((1:4)+n*(j-1)))'*time
-    zdot=(coeffz((2:4)+n*(j-1)))'*[12*t13*t1^2]
-    zddot=(coeffz((3:4)+n*(j-1)))'*[26*t1]
+    Tfwd_lim = [Tfwd_traj[j], Tfwd_traj[j+1]]      #linear interpol of feed forward thrust
+    Tfwd = np.interp(time_lim, Tfwd_lim, time_new) # check validity
+    
+    Mfwd_lim = [Mfwd_traj[j], Mfwd_traj[j+1]]      #linear interpol of feed forward thrust
+    Mfwd=np.interp(time_lim, Mfwd_lim, time_new)
+    
+    z = coeffz[n*(j) : 4+n*(j)] # 4x1 array
+    z = np.transpose(z)
+    z = np.dot(z,time)
+    
+    zdot = coeffz[1+n*(j) : 4+n*(j)] # 4x1 array
+    zdot = np.transpose(zdot)
+    zdot = np.dot(zdot,np.array[[1], [2*t1], [3*(t1**2)]])
+    
+    zddot = coeffz[2+n*(j) : 4+n*(j)] # 4x1 array
+    zddot = np.transpose(zddot)
+    zddot = np.dot(zddot,np.array[[2], [6*t1]])
+    
     y=0
     ydot=0
     yddot=0
     
     des_state = desired_state()
-    des_state.pos = [x y z]
-    des_state.vel = [xdot ydot zdot]
-    des_state.acc = [xddot yddot zddot]
-    des_state.rot=[phid thetad psid]
-    des_state.omega=[phidot_des thetadot_des psidot_des]
-    des_state.control=[Tfwd Mfwd]
+    des_state.pos = [x, y, z]
+    des_state.vel = [xdot, ydot, zdot]
+    des_state.acc = [xddot, yddot, zddot]
+    des_state.rot=[phid, thetad, psid]
+    des_state.omega=[phidot_des, thetadot_des, psidot_des]
+    des_state.control=[Tfwd, Mfwd]
     return des_state
