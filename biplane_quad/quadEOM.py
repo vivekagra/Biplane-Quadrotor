@@ -1,8 +1,9 @@
-from biplane_quad import globals
-from biplane_quad.utils import stateToQd
-from biplane_quad.time_traj_hover import time_traj_hover
-from biplane_quad.time_traj_fortrans import time_traj_fortrans
-from biplane_quad.time_traj_land import time_traj_land
+from globals import flag, hover_t, hover_z, hover_x, hover_y
+from utils import stateToQd
+from time_traj_hover import time_traj_hover
+from time_traj_fortrans import time_traj_fortrans
+from time_traj_land import time_traj_land
+from time_traj_cruise import time_traj_cruise
 
 def quadEOM(t, s, controlhandle, trajhandle, BQ):
 # % QUADEOM Wrapper function for solving quadrotor equation of motion

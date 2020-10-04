@@ -1,13 +1,11 @@
-from biplane_quad.globals import flag, hover_t, hover_z, hover_x, hover_y
-from biplane_quad.utils import desired_state
+from globals import flag, hover_t, hover_z, hover_x, hover_y
+from utils import desired_state
 
 def time_traj_hover(t,s):
     if (t<1):
         z=t
     else:
         z=1
-        
-    
     #z=t;
     x=0
     y=0
@@ -45,5 +43,4 @@ def time_traj_hover(t,s):
             hover_z=s.pos[2]
             hover_x=s.pos[0]
             hover_y=s.pos[1]
-        else:
-            return
+    return des_state

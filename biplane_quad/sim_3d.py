@@ -1,7 +1,9 @@
 import globals
 from globals import systemParameters
 from scipy.integrate import solve_ivp
+from init_state import init_state
 from quadEOM import quadEOM
+import numpy as np
 
 def sim_3d(trajhandle, controlhandle):
     max_time = 10; #6
@@ -21,43 +23,45 @@ def sim_3d(trajhandle, controlhandle):
     x0    = init_state(des_start.pos,des_start.vel,des_start.rot,des_start.omega);
 
     #%x0(9)=1.6;
-    xtraj = zeros(max_iter*nstep, length(x0));
-    ttraj = zeros(max_iter*nstep, 1);
-    des_x = zeros(max_iter*nstep, 1);
-    des_z = zeros(max_iter*nstep, 1);
-    des_y = zeros(max_iter*nstep, 1);
-    des_vx = zeros(max_iter*nstep, 1);
-    des_vy = zeros(max_iter*nstep, 1);
-    des_vz = zeros(max_iter*nstep, 1);
-    des_phi = zeros(max_iter*nstep, 1);
-    des_psi = zeros(max_iter*nstep, 1);
-    F = zeros(max_iter*nstep, 1);
-    Mx = zeros(max_iter*nstep, 1);
-    My = zeros(max_iter*nstep, 1);
-    Mz = zeros(max_iter*nstep, 1);
-    Fa1x = zeros(max_iter*nstep, 1);
-    Fa1y = zeros(max_iter*nstep, 1);
-    Fa1z = zeros(max_iter*nstep, 1);
-    taux = zeros(max_iter*nstep, 1);
-    tauy = zeros(max_iter*nstep, 1);
-    tauz = zeros(max_iter*nstep, 1);
-    des_theta = zeros(max_iter*nstep, 1);
-    des_thrust=zeros(max_iter*nstep, 1);
-    des_thetadot=zeros(max_iter*nstep, 1);
-    des_phidot=zeros(max_iter*nstep, 1);
-    des_psidot=zeros(max_iter*nstep, 1);
+    store_shape = int(max_iter*nstep)
+    xtraj = np.zeros((store_shape, len(x0)));
+    ttraj = np.zeros(store_shape);
+    des_x = np.zeros(store_shape);
+    des_z = np.zeros(store_shape);
+    des_y = np.zeros(store_shape);
+    des_vx = np.zeros(store_shape);
+    des_vy = np.zeros(store_shape);
+    des_vz = np.zeros(store_shape);
+    des_phi = np.zeros(store_shape);
+    des_psi = np.zeros(store_shape);
+    F = np.zeros(store_shape);
+    Mx = np.zeros(store_shape);
+    My = np.zeros(store_shape);
+    Mz = np.zeros(store_shape);
+    Fa1x = np.zeros(store_shape);
+    Fa1y = np.zeros(store_shape);
+    Fa1z = np.zeros(store_shape);
+    taux = np.zeros(store_shape);
+    tauy = np.zeros(store_shape);
+    tauz = np.zeros(store_shape);
+    des_theta = np.zeros(store_shape);
+    des_thrust=np.zeros(store_shape);
+    des_thetadot=np.zeros(store_shape);
+    des_phidot=np.zeros(store_shape);
+    des_psidot=np.zeros(store_shape);
 
     x       = x0;    #    % state
     #%% ************************* RUN SIMULATION *************************
     print('Simulation Running....');
     # % Main loop
-    for iter in range(1,max_iter):
+    for iter in range(1,int(max_iter)):
 
         # timeint = time:tstep:time +cstep;
-        timeint = np.linspace(time, time+cstep, tstep)
+        timeint = np.arange(time, time+cstep, tstep)
         
         # %tic;
         # % Run simulation
+    
         [tsave, xsave] = solve_ivp(quadEOM(t, s, controlhandle, trajhandle, BQ), timeint, x)
         x    = xsave[end, :].T
        
@@ -112,34 +116,34 @@ def sim_3d(trajhandle, controlhandle):
     %             des_state = trajhandle(ttraj((iter-1)*nstep+i), []);
     %             des_state.pos(1)=des_state.pos(1)+5.13;         
            """
-            des_z((iter-1)*nstep+i)=des_state.pos(3);
-            des_x((iter-1)*nstep+i)=des_state.pos(1);
-            des_y((iter-1)*nstep+i)=des_state.pos(2);
-            des_vx((iter-1)*nstep+i)=des_state.vel(1);
-            des_vy((iter-1)*nstep+i)=des_state.vel(2);
-            des_vz((iter-1)*nstep+i)=des_state.vel(3);
-            des_phi((iter-1)*nstep+i)=des_state.rot(1);
-            des_theta((iter-1)*nstep+i)=des_state.rot(2);
-            des_thetadot((iter-1)*nstep+i)=des_state.omega(2);
-            des_phidot((iter-1)*nstep+i)=des_state.omega(1);
-            des_psidot((iter-1)*nstep+i)=des_state.omega(3);
+            des_z[(iter-1)*nstep+i]=des_state.pos[2];
+            des_x[(iter-1)*nstep+i]=des_state.pos[0];
+            des_y[(iter-1)*nstep+i]=des_state.pos[1];
+            des_vx[(iter-1)*nstep+i]=des_state.vel[0];
+            des_vy[(iter-1)*nstep+i]=des_state.vel[1];
+            des_vz[(iter-1)*nstep+i]=des_state.vel[2];
+            des_phi[(iter-1)*nstep+i]=des_state.rot[0];
+            des_theta[(iter-1)*nstep+i]=des_state.rot[1];
+            des_thetadot[(iter-1)*nstep+i]=des_state.omega[1];
+            des_phidot[(iter-1)*nstep+i]=des_state.omega[0];
+            des_psidot[(iter-1)*nstep+i]=des_state.omega[2];
 
-            des_psi((iter-1)*nstep+i)=des_state.rot(3);
-            des_thrust((iter-1)*nstep+i)=des_state.control(1);
+            des_psi[(iter-1)*nstep+i]=des_state.rot[2];
+            des_thrust[(iter-1)*nstep+i]=des_state.control[0];
             s1 = xsave[i,:];
             current_state = stateToQd(s1);
             [F1, Fa1, M1, tau_a1] = controlhandle(tsave(i), current_state, des_state, BQ);
      
-            F((iter-1)*nstep+i)=F1;
-            Mx((iter-1)*nstep+i)=M1(1);
-            My((iter-1)*nstep+i)=M1(2);
-            Mz((iter-1)*nstep+i)=M1(3);
-            Fa1x((iter-1)*nstep+i)=Fa1(1);
-            Fa1y((iter-1)*nstep+i)=Fa1(2);
-            Fa1z((iter-1)*nstep+i)=Fa1(3);
-            taux((iter-1)*nstep+i)=tau_a1(1);
-            tauy((iter-1)*nstep+i)=tau_a1(2);
-            tauz((iter-1)*nstep+i)=tau_a1(3);
+            F[(iter-1)*nstep+i]=F1;
+            Mx[(iter-1)*nstep+i]=M1[0];
+            My[(iter-1)*nstep+i]=M1[1];
+            Mz[(iter-1)*nstep+i]=M1[2];
+            Fa1x[(iter-1)*nstep+i]=Fa1[0];
+            Fa1y[(iter-1)*nstep+i]=Fa1[1];
+            Fa1z[(iter-1)*nstep+i]=Fa1[2];
+            taux[(iter-1)*nstep+i]=tau_a1[0];
+            tauy[(iter-1)*nstep+i]=tau_a1[1];
+            tauz[(iter-1)*nstep+i]=tau_a1[2];
 
         time = time + cstep; #% Update simulation time
         
