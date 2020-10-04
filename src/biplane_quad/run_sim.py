@@ -1,5 +1,5 @@
 from globals import flag, hover_t, fort_t, backt_t, cruise_t
-
+from sim_3d import sim_3d
 """ File to run the simultor """
 #controlhandle = @controller;
 #trajhandle = @time_traj_hover;
