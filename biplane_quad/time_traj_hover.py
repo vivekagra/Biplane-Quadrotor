@@ -1,5 +1,5 @@
-from globals import flag, hover_t, hover_z, hover_x, hover_y
-from utils import desired_state
+from biplane_quad.globals import flag, hover_t, hover_z, hover_x, hover_y
+from biplane_quad.utils import desired_state
 
 def time_traj_hover(t,s):
     if (t<1):

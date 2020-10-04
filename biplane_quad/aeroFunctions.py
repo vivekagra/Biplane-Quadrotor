@@ -1,4 +1,5 @@
-from globals import system_paramters
+from globals import systemParameters
+import numpy as np
 from utils import eul2rotm
 
 def momentEstimate(eul, x_dot, omega, Fa):
@@ -15,13 +16,13 @@ def momentEstimate(eul, x_dot, omega, Fa):
 	Rq2w = np.array(
 		[[0, 0, 1],
 	    [0, 1, 0],
-	    [-1, 0, 0]]
+	    [-1, 0, 0]])
 	xw_dot = np.dot(Rq2w, xb_dot)
 
 	if (xw_dot(0)!=0):
 	    alpha=np.arctan2(-xw_dot(2),xw_dot(0))
 	    beta=np.arctan2(xw_dot(1),xw_dot(0))
-	else
+	else:
 	    alpha=0
 	    beta=0	
 
@@ -49,7 +50,7 @@ def momentEstimate(eul, x_dot, omega, Fa):
 	# % M_cg = M_ac + [0;r*L;0]; % wing frame
 
 	# % Moment_aero = BQ.wing_n*Rq2w'*M_cg; % body frame
-	Moment_aero = [0;BQ.wing_n*My_w_ac+r*Fa(1);0];
+	Moment_aero = np.array([0,BQ.wing_n*My_w_ac+r*Fa(1),0]).T
 
 
 def forceEstimate(eul,x_dot,omega):
@@ -69,56 +70,53 @@ def forceEstimate(eul,x_dot,omega):
 	if (V==0):
 		return
 
-	Rq2w = [
-	    0 0 1;
-	    0 1 0;
-	    -1 0 0];
-	xw_dot = Rq2w*xb_dot;
+	Rq2w = np.array([
+	    [0, 0, 1],
+	    [0, 1, 0],
+	    [-1, 0, 0]])
+	xw_dot = np.dot(Rq2w,xb_dot)
 
-	% alpha=atan2(-xw_dot(3),xw_dot(1));
-	% beta=atan2(xw_dot(2),xw_dot(1));
+	#% alpha=atan2(-xw_dot(3),xw_dot(1));
+	#% beta=atan2(xw_dot(2),xw_dot(1));
 
-	if (xw_dot(1)~=0)
-	    alpha=atan2(-xw_dot(3),xw_dot(1));
-	    beta=atan2(xw_dot(2),xw_dot(1));
-	else
+	if (xw_dot[0]!=0):
+	    alpha=atan2(-xw_dot[2],xw_dot[0]);
+	    beta=atan2(xw_dot[1],xw_dot[0]);
+	else:
 	    alpha=0;
 	    beta=0;
-	end
-	% alpha=atan2(xb_dot(1),xb_dot(3));
-	% beta=atan2(xb_dot(2),xb_dot(3));
+#	% alpha=atan2(xb_dot(1),xb_dot(3));
+	#% beta=atan2(xb_dot(2),xb_dot(3));
 
-	% alpha = abs(alpha);
-	% beta = abs(beta);
+#	% alpha = abs(alpha);
+#	% beta = abs(beta);
 
-	A=[ sin(alpha)*cos(beta)    -sin(alpha)*sin(beta)      cos(alpha) ;
-	    sin(beta)               cos(beta)                 0       ;
-	    -cos(alpha)*cos(beta)   cos(alpha)*sin(beta)     sin(alpha)   ];
+	A=np.array([[sin(alpha)*cos(beta),   -sin(alpha)*sin(beta), cos(alpha)],
+               [sin(beta)           , cos(beta)                ,0       ],
+	           [-cos(alpha)*cos(beta),   cos(alpha)*sin(beta),     sin(alpha)]])
 
 	sigma_a = (1 + exp(-BQ.M*(alpha-BQ.alpha0)) + exp(BQ.M*(alpha+BQ.alpha0)))/(( 1 + exp(-BQ.M*(alpha-BQ.alpha0)))*(1 + exp(BQ.M*(alpha+BQ.alpha0))));
 
 
 	CLofalpha = (1-sigma_a)*(BQ.CL0+BQ.CL_alpha*alpha) + sigma_a*(2*sign(alpha)*(sin(alpha)^2)*cos(alpha));
-	%     CLofalpha = (2*sign(alpha)*(sin(alpha)^2)*cos(alpha));
+#	%     CLofalpha = (2*sign(alpha)*(sin(alpha)^2)*cos(alpha));
 
 
 	CL = CLofalpha + BQ.CLq*(q*BQ.c/2*V);
 	CD = BQ.CD_0 + BQ.k*(CL^2) + 1*((sin(alpha))^2);
 
-	omega_w = Rq2w*omega;
-	p_w = omega_w(1,1);
-	q_w = omega_w(2,1);
-	r_w = omega_w(3,1);
+	omega_w = Rq2w*omega
+	p_w = omega_w[0,0]
+	q_w = omega_w[1,0]
+	r_w = omega_w[2,0]
 
 	CY = BQ.CY_beta*beta + BQ.CY_p*(p_w*BQ.b/(2*V)) + BQ.CY_r*(r_w*BQ.b/(2*V));
 
-	L = 0.5*rho*(V^2)*BQ.S*CL ;
-	D = 0.5*rho*(V^2)*BQ.S*CD ;
-	Y = 0.5*rho*(V^2)*BQ.S*CY ;
+	L = 0.5*rho*(V^2)*BQ.S*CL 
+	D = 0.5*rho*(V^2)*BQ.S*CD 
+	Y = 0.5*rho*(V^2)*BQ.S*CY 
 
-	Fa=BQ.wing_n*A*[-D;Y;-L];
-	Fa(2,1)=-Fa(2,1);
-	Fa(3,1)=-Fa(3,1);
-	Fa_w = [L;D;Y];
-
-		
+	Fa=BQ.wing_n*A*np.array([-D,Y,-L]).T
+	Fa[1,0]=-Fa[1,0]
+	Fa[2,0]=-Fa[2,0]
+	Fa_w = np.array([L,D,Y]).T

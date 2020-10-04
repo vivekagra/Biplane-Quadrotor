@@ -1,5 +1,5 @@
-from globals import backt_t, backt_z, max_time
-from utils import desired_state
+from biplane_quad.globals import backt_t, backt_z, max_time
+from biplane_quad.utils import desired_state
 
 def time_traj_land(t):
     # t1=t-backt_t

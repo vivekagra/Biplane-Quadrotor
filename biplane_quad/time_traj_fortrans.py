@@ -1,6 +1,6 @@
-from globals import hover_t, fort_t, flag, fort_x, fort_y, fort_z
-from utils import traj_gen
-from utils import desired_state
+from biplane_quad.globals import hover_t, fort_t, flag, fort_x, fort_y, fort_z
+from biplane_quad.utils import traj_gen
+from biplane_quad.utils import desired_state
 import numpy as np
 
 def time_traj_fortrans(t,s):

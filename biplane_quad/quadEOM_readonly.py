@@ -44,11 +44,12 @@ def quadEOM_readonly(t, s, F, Fa, M, tau_a, BQ):
     # % omega=[1 0 -sin(thetac);0 cos(phic) cos(thetac)*sin(phic);0 -sin(phic) cos(thetac)*cos(phic)]*[phidotc; thetadotc; psidotc];
     # % pqrdot   = (BQ.J)\(M - cross(omega, BQ.J*omega)+tau_a);
     # % eulddot = [1 sin(phic)*tan(thetac) cos(phic)*tan(thetac);0 cos(phic) -sin(phic);0 sin(phic)*sec(thetac) sec(thetac)*cos(phic)]*pqrdot;
-    Eul_dot=[phidotc,thetadotc,psidotc];
-    A=[1 0 -sin(thetac);
-        0 cos(phic) sin(phic)*cos(thetac);
-        0 -sin(phic) cos(phic)*cos(thetac)];
-    Omega=A*Eul_dot;
+    Eul_dot=[phidotc,thetadotc,psidotc]
+    A=np.array(
+        [[1, 0, -sin(thetac)],
+        [0, cos(phic), sin(phic)*cos(thetac)],
+        [0, -sin(phic), cos(phic)*cos(thetac)]])
+    Omega=np.dot(A,Eul_dot);
     
     Omega_dot   = (BQ.J)\(M+tau_a-cross(Omega',(BQ.J*Omega)')');
     

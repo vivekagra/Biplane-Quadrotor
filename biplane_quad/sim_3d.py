@@ -62,8 +62,8 @@ def sim_3d(trajhandle, controlhandle):
         x    = xsave[end, :].T
        
         # % Save to traj
-        xtraj((iter-1)*nstep+1:iter*nstep,:) = xsave(1:end-1,:);
-        ttraj((iter-1)*nstep+1:iter*nstep) = tsave(1:end-1);
+        xtraj[(iter-1)*nstep:iter*nstep,:] = xsave[0:end-1,:];
+        ttraj[(iter-1)*nstep:iter*nstep] = tsave[0:end-1];
 
         
         for i in range(1,nstep+1):
@@ -76,45 +76,43 @@ def sim_3d(trajhandle, controlhandle):
     # %                 end
     # %             end
     # %         end
-            if (backt_t>0 && ttraj((iter-1)*nstep+i)>=backt_t):
-                trajhandle = @time_traj_land;
+            if (backt_t>0 and ttraj[(iter-1)*nstep+i-1]>=backt_t):
+                trajhandle = time_traj_land;
+                des_state = trajhandle(ttraj[(iter-1)*nstep+i], []);
+                #des_state.pos(2);
+                des_state.pos[1]=des_state.pos[1]+backt_y;
+                des_state.pos[0]=des_state.pos[0]+backt_x;
+            elif (cruise_t>0 and ttraj[(iter-1)*nstep+i]>cruise_t):
+                trajhandle = time_traj_backtrans;
+                des_state = trajhandle(ttraj[(iter-1)*nstep+i], []);
+                des_state.pos[2]=des_state.pos[2]+cruise_z;
+                des_state.pos[1]=des_state.pos[1]+cruise_y;
+                des_state.pos[0]=des_state.pos[0]+cruise_x;
+            elif (fort_t>0 and ttraj((iter-1)*nstep+i)>fort_t):
+                trajhandle = time_traj_cruise;
+                des_state = trajhandle(ttraj[(iter-1)*nstep+i], []);
+                des_state.pos[2]=des_state.pos[2]+fort_z;
+                des_state.pos[1]=des_state.pos[1]+fort_y;
+                des_state.pos[0]=des_state.pos[0]+fort_x;
+            elif (hover_t>0 and ttraj((iter-1)*nstep+i)>hover_t):
+                trajhandle = time_traj_fortrans;
+                des_state = trajhandle(ttraj[(iter-1)*nstep+i], []);
+                des_state.pos[2]=des_state.pos[2]+hover_z;
+                des_state.pos[1]=des_state.pos[1]+hover_y;
+                des_state.pos[0]=des_state.pos[0]+hover_x;
+                
+            else:
+                trajhandle = time_traj_hover;
                 des_state = trajhandle(ttraj((iter-1)*nstep+i), []);
                 des_state.pos(3);
-                des_state.pos(2)=des_state.pos(2)+backt_y;
-                des_state.pos(1)=des_state.pos(1)+backt_x;
-            elseif (cruise_t>0 && ttraj((iter-1)*nstep+i)>cruise_t)
-                trajhandle = @time_traj_backtrans;
-                des_state = trajhandle(ttraj((iter-1)*nstep+i), []);
-                des_state.pos(3)=des_state.pos(3)+cruise_z;
-                des_state.pos(2)=des_state.pos(2)+cruise_y;
-                des_state.pos(1)=des_state.pos(1)+cruise_x;
-            elseif (fort_t>0 && ttraj((iter-1)*nstep+i)>fort_t)
-                trajhandle = @time_traj_cruise;
-                des_state = trajhandle(ttraj((iter-1)*nstep+i), []);
-                des_state.pos(3)=des_state.pos(3)+fort_z;
-                des_state.pos(2)=des_state.pos(2)+fort_y;
-                des_state.pos(1)=des_state.pos(1)+fort_x;
-            elseif (hover_t>0 && ttraj((iter-1)*nstep+i)>hover_t)
-                trajhandle = @time_traj_fortrans;
-                des_state = trajhandle(ttraj((iter-1)*nstep+i), []);
-                des_state.pos(3)=des_state.pos(3)+hover_z;
-                des_state.pos(2)=des_state.pos(2)+hover_y;
-                des_state.pos(1)=des_state.pos(1)+hover_x;
-                
-            else
-                trajhandle = @time_traj_hover;
-                des_state = trajhandle(ttraj((iter-1)*nstep+i), []);
-                des_state.pos(3);
-                %des_state.pos(3)=des_state.pos(3)+1;
-            end
-                
+                #%des_state.pos(3)=des_state.pos(3)+1;
+            """    
     %         else
     %             trajhandle = @time_traj_cruise;
     %             des_state = trajhandle(ttraj((iter-1)*nstep+i), []);
     %             des_state.pos(1)=des_state.pos(1)+5.13;         
-           
+           """
             des_z((iter-1)*nstep+i)=des_state.pos(3);
-           
             des_x((iter-1)*nstep+i)=des_state.pos(1);
             des_y((iter-1)*nstep+i)=des_state.pos(2);
             des_vx((iter-1)*nstep+i)=des_state.vel(1);
@@ -128,7 +126,7 @@ def sim_3d(trajhandle, controlhandle):
 
             des_psi((iter-1)*nstep+i)=des_state.rot(3);
             des_thrust((iter-1)*nstep+i)=des_state.control(1);
-            s1 = xsave(i,:);
+            s1 = xsave[i,:];
             current_state = stateToQd(s1);
             [F1, Fa1, M1, tau_a1] = controlhandle(tsave(i), current_state, des_state, BQ);
      
@@ -143,25 +141,21 @@ def sim_3d(trajhandle, controlhandle):
             tauy((iter-1)*nstep+i)=tau_a1(2);
             tauz((iter-1)*nstep+i)=tau_a1(3);
 
-         end
-
-        time = time + cstep; % Update simulation time
+        time = time + cstep; #% Update simulation time
         
-        %t = toc;
+      #  %t = toc;
     iter;
 
-    end
+    #%% ************************* POST PROCESSING *************************
+    #% Truncate xtraj and ttraj
+    xtraj = xtraj[1:iter*nstep,:];
+    ttraj = ttraj[1:iter*nstep];
+    des_x=des_x[1:iter*nstep];
+    des_z=des_z[1:iter*nstep];
+    des_y=des_y[1:iter*nstep];
+    des_theta=des_theta[1:iter*nstep];
 
-    %% ************************* POST PROCESSING *************************
-    % Truncate xtraj and ttraj
-    xtraj = xtraj(1:iter*nstep,:);
-    ttraj = ttraj(1:iter*nstep);
-    des_x=des_x(1:iter*nstep);
-    des_z=des_z(1:iter*nstep);
-    des_y=des_y(1:iter*nstep);
-    des_theta=des_theta(1:iter*nstep);
-
-
+    """
         figure(1)
         subplot(3,3,1)
         plot(ttraj,xtraj(:,1),'b');
@@ -278,7 +272,8 @@ def sim_3d(trajhandle, controlhandle):
     %     ylabel('des thrust');
         
     disp('finished.')
-    t_out = ttraj;
-    s_out = xtraj;
+    """
+    t_out = ttraj
+    s_out = xtraj
 
-return t_out, s_out
+    return t_out, s_out
