@@ -1,5 +1,7 @@
 import globals
 from globals import systemParameters
+from scipy.integrate import solve_ivp
+from quadEOM import quadEOM
 
 def sim_3d(trajhandle, controlhandle):
     max_time = 10; #6
@@ -46,36 +48,35 @@ def sim_3d(trajhandle, controlhandle):
     des_psidot=zeros(max_iter*nstep, 1);
 
     x       = x0;    #    % state
-
-
     #%% ************************* RUN SIMULATION *************************
     print('Simulation Running....');
     # % Main loop
     for iter in range(1,max_iter):
 
-        timeint = time:tstep:time+cstep;
+        # timeint = time:tstep:time +cstep;
+        timeint = np.linspace(time, time+cstep, tstep)
         
         # %tic;
         # % Run simulation
-        [tsave, xsave] = ode45(@(t,s) quadEOM(t, s, controlhandle, trajhandle, BQ), timeint, x);
-        x    = xsave(end, :)';
+        [tsave, xsave] = solve_ivp(quadEOM(t, s, controlhandle, trajhandle, BQ), timeint, x)
+        x    = xsave[end, :].T
        
-        % Save to traj
+        # % Save to traj
         xtraj((iter-1)*nstep+1:iter*nstep,:) = xsave(1:end-1,:);
         ttraj((iter-1)*nstep+1:iter*nstep) = tsave(1:end-1);
 
         
-        for i=1:nstep
-    %         if (flag ==1)
-    %             trajhandle = @time_traj_hover;
-    %         else if (flag ==2)
-    %                 trajhandle = @time_traj_fortrans;
-    %             else if (flag ==3)
-    %                     trajhandle = @time_traj_backtrans;
-    %                 end
-    %             end
-    %         end
-            if (backt_t>0 && ttraj((iter-1)*nstep+i)>=backt_t)
+        for i in range(1,nstep+1):
+    # %         if (flag ==1)
+    # %             trajhandle = @time_traj_hover;
+    # %         else if (flag ==2)
+    # %                 trajhandle = @time_traj_fortrans;
+    # %             else if (flag ==3)
+    # %                     trajhandle = @time_traj_backtrans;
+    # %                 end
+    # %             end
+    # %         end
+            if (backt_t>0 && ttraj((iter-1)*nstep+i)>=backt_t):
                 trajhandle = @time_traj_land;
                 des_state = trajhandle(ttraj((iter-1)*nstep+i), []);
                 des_state.pos(3);
