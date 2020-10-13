@@ -58,14 +58,11 @@ def sim_3d(trajhandle, controlhandle):
 
         # timeint = time:tstep:time +cstep;
         timeint = np.arange(time, time+cstep, tstep)
-        
-        # %tic;
-        # % Run simulation
     
         [tsave, xsave] = solve_ivp(quadEOM(t, s, controlhandle, trajhandle, BQ), timeint, x)
         x    = xsave[end, :].T
        
-        # % Save to traj
+        # Save to traj
         xtraj[(iter-1)*nstep:iter*nstep,:] = xsave[0:end-1,:];
         ttraj[(iter-1)*nstep:iter*nstep] = tsave[0:end-1];
 

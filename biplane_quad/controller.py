@@ -2,6 +2,7 @@ from numpy import identity as eye
 from numpy import sin as sin
 from numpy import cos as cos
 from utils import eul2rotm
+from aeroFunctions import momentEstimate, forceEstimate
 import globals
 
 class Controller:
@@ -101,17 +102,19 @@ class Controller:
 
         R=eul2rotm(des_state.rot)
         
-        #Fa=AeroFEst([0 state.rot(2) 0],[state.vel(1);0;state.vel(3)],omega_curr)
+        #Fa=forceEstimate([0 state.rot(2) 0],[state.vel(1);0;state.vel(3)],omega_curr)
         
-        Fa = AeroFEst([state.rot[0], state.rot[1], state.rot[2]],[[state.vel[0]], [state.vel[1]], [state.vel[2]]], omega_curr);
+        Fa = forceEstimate([state.rot[0], state.rot[1], state.rot[2]],
+                              [state.vel[0], state.vel[1], state.vel[2]], omega_curr);
 
         if ud[0]!=0:
             BQ.g =0
 
-        acc_net=((R*[ [0], [0], ud[0]]) / BQ.m) + 
+        acc_net=(((R*[ [0], [0], ud[0]]) / BQ.m) + 
                         kp*[[0], [0], [(des_state.pos[2] - state.pos[2])]] + 
-                        kv*[[(des_state.vel[0] - state.vel[0])], [(des_state.vel[1]-state.vel[1])], [(des_state.vel[2]-state.vel[2])]] + 
-                        [[0], [0], [BQ.g]] - ((Rb*Fa)/(BQ.m))
+                        kv*[[(des_state.vel[0] - state.vel[0])], 
+                             [(des_state.vel[1]-state.vel[1])], [(des_state.vel[2]-state.vel[2])]] + 
+                        [[0], [0], [BQ.g]] - ((Rb*Fa)/(BQ.m)))
 
         # calculation of current euler angles
         b3 =acc_net/norm(acc_net)
@@ -126,11 +129,12 @@ class Controller:
         
         R = eul2rotm(state.rot)
         erm = 0.5*((np.transpose(Rd)*R) - (np.transpose(R)*Rd))
-        er = [[erm[2,1], [erm[0,2]], [erm[1,0]]]
+        er = [[erm[2,1], [erm[0,2]], [erm[1,0]]]]
         ew = (omega_curr-((np.transpose(R)*Rd)*omega_des))
         
-        tau_a=AeroMEst([state.rot[0], state.rot[1], state.rot[2]], [[state.vel[0]], [state.vel[1]], [state.vel[2]],omega_curr, Fa)
+        tau_a=momentEstimate([state.rot[0], state.rot[1], state.rot[2]], 
+                                             [[state.vel[0], state.vel[1], state.vel[2]]], omega_curr, Fa)
         
-        # tau_a=AeroMEst([0; state.rot(2); 0],[state.vel(1);0;state.vel(3)],omega_curr, Fa);
+        # tau_a=momentEstimate([0; state.rot(2); 0],[state.vel(1);0;state.vel(3)],omega_curr, Fa);
         # tau_a=[0;0;0]
         M=[[0], [ud(2)], [0]] - kr*er - kw*ew + np.cross(omega_curr,BQ.J * omega_curr) - BQ.J*np.cross(ew,(np.transpose(R)*Rd)*omega_des)-tau_a    # moment input
