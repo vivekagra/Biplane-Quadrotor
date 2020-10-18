@@ -1,15 +1,16 @@
-import globals
+from globals import flag, hover_t, hover_z, hover_x, hover_y
+from globals import t, s
 from globals import systemParameters
 from scipy.integrate import solve_ivp
 from init_state import init_state
 from quadEOM import quadEOM
 import numpy as np
+global t,s
 
 def sim_3d(trajhandle, controlhandle):
     max_time = 10; #6
     #% parameters for simulation
     BQ = systemParameters()
-
     # *********************** INITIAL CONDITIONS ***********************
     print('Setting initial conditions...')
 
@@ -49,8 +50,12 @@ def sim_3d(trajhandle, controlhandle):
     des_thetadot=np.zeros(store_shape);
     des_phidot=np.zeros(store_shape);
     des_psidot=np.zeros(store_shape);
+    
+    des_start = trajhandle(0, []);
+    x0    = init_state(des_start.pos,des_start.vel,des_start.rot,des_start.omega);
+    x = x0;    #    % state
+    t = 0
 
-    x       = x0;    #    % state
     #%% ************************* RUN SIMULATION *************************
     print('Simulation Running....');
     # % Main loop
@@ -59,7 +64,7 @@ def sim_3d(trajhandle, controlhandle):
         # timeint = time:tstep:time +cstep;
         timeint = np.arange(time, time+cstep, tstep)
     
-        [tsave, xsave] = solve_ivp(quadEOM(t, s, controlhandle, trajhandle, BQ), timeint, x)
+        [tsave, xsave] = solve_ivp(quadEOM(controlhandle, trajhandle, BQ), timeint, x)
         x    = xsave[end, :].T
        
         # Save to traj

@@ -25,12 +25,12 @@ def time_traj_hover(t,s):
     Mfwd=0
     
     des_state = desired_state()
-    des_state.pos = [[x], [y], [z]]
-    des_state.vel = [[xdot], [ydot], [zdot]]
-    des_state.acc = [[xddot], [yddot], [zddot]]
-    des_state.rot = [[phid], [thetad], [psid]]
-    des_state.omega = [[phidot_des], [thetadot_des], [psidot_des]]
-    des_state.control = [[Tfwd], [Mfwd]]
+    des_state.pos = [x, y, z]
+    des_state.vel = [xdot, ydot, zdot]
+    des_state.acc = [xddot, yddot, zddot]
+    des_state.rot = [phid, thetad, psid]
+    des_state.omega = [phidot_des, thetadot_des, psidot_des]
+    des_state.control = [Tfwd, Mfwd]
     
     
     if (t>1 and len(s)>0):

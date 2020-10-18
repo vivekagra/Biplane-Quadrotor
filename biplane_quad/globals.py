@@ -1,6 +1,11 @@
 """ This file stores all the global variables"""
-
+import numpy as np
 from numpy import pi
+
+global s
+global t
+t=0
+s=np.zeros(12)
 
 global flag
 flag = 0

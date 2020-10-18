@@ -81,7 +81,7 @@ class Qd:
 
 def stateToQd(x):
 	qd = Qd()
-	
+	print(x)
 	qd.pos = x[0:3]
 	qd.vel = x[3:6]
 	qd.rot = x[6:9]

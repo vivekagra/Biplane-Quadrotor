@@ -1,11 +1,14 @@
 from globals import flag, hover_t, hover_z, hover_x, hover_y
+from globals import t, s
+from quadEOM_readonly import quadEOM_readonly
+# import globals
 from utils import stateToQd
 from time_traj_hover import time_traj_hover
 from time_traj_fortrans import time_traj_fortrans
 from time_traj_land import time_traj_land
 from time_traj_cruise import time_traj_cruise
 
-def quadEOM(t, s, controlhandle, trajhandle, BQ):
+def quadEOM(controlhandle, trajhandle, BQ):
 # % QUADEOM Wrapper function for solving quadrotor equation of motion
 # % 	quadEOM takes in time, state vector, controller, trajectory generator
 # % 	and parameters and output the derivative of the state vector, the
@@ -23,6 +26,7 @@ def quadEOM(t, s, controlhandle, trajhandle, BQ):
 
 # % convert state to quad stuct for control
 # global flag hover_x hover_y hover_z fort_x fort_y fort_z backt_t cruise_z cruise_x cruise_y backt_x backt_y backt_z
+    print(s)
     current_state = stateToQd(s);
     if (flag ==1):
         trajhandle = time_traj_hover;
@@ -57,7 +61,10 @@ def quadEOM(t, s, controlhandle, trajhandle, BQ):
         desired_state.pos[2]=desired_state.pos[2];
     
     # % get control outputs
-    [F, Fa, M, tau_a] = controlhandle(t, current_state, desired_state, BQ)
+    c = controlhandle(t, current_state, desired_state, BQ)
+    [F, Fa, M, tau_a] = c.run()
+
+    print(tau_a)
     
     # % compute derivative
     sdot = quadEOM_readonly(t, s, F, Fa, M, tau_a, BQ);

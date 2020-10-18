@@ -3,7 +3,8 @@
 import numpy as np
 
 def init_state(start_pos,start_vel,start_rot,start_omega):
-    s = np.zeros((30,1))
+    s = np.zeros(12)
+    print(start_pos)
     s[0]  = start_pos[0]               #x
     s[1]  = start_pos[1]               #y
     s[2]  = start_pos[2]               #z

@@ -1,12 +1,18 @@
 from globals import systemParameters
 import numpy as np
+from numpy import sin as sin
+from numpy import cos as cos
+from numpy import exp as exp
+
 from utils import eul2rotm
 
 def momentEstimate(eul, x_dot, omega, Fa):
 	BQ = systemParameters()
 	rho=1.225
 	Moment_aero=(np.zeros(3)).T
-	R=eul2rotm(eul)
+	R=np.array(eul2rotm(eul))
+	x_dot = np.array(x_dot).T
+	print(R, x_dot)
 	xb_dot=np.dot(R.T,x_dot);
 	V=np.linalg.norm(x_dot);
 
@@ -63,12 +69,9 @@ def forceEstimate(eul,x_dot,omega):
 	q=omega[1,0];
 	r=omega[2,0];
 	rho=1.225;
-	R=eul2rotm(eul);
-	xb_dot=np.dot(R.T*x_dot);
+	R=np.array(eul2rotm(eul))
+	xb_dot=np.dot(R.T,x_dot);
 	V=np.linalg.norm(x_dot);
-
-	if (V==0):
-		return
 
 	Rq2w = np.array([
 	    [0, 0, 1],
@@ -98,12 +101,12 @@ def forceEstimate(eul,x_dot,omega):
 	sigma_a = (1 + exp(-BQ.M*(alpha-BQ.alpha0)) + exp(BQ.M*(alpha+BQ.alpha0)))/(( 1 + exp(-BQ.M*(alpha-BQ.alpha0)))*(1 + exp(BQ.M*(alpha+BQ.alpha0))));
 
 
-	CLofalpha = (1-sigma_a)*(BQ.CL0+BQ.CL_alpha*alpha) + sigma_a*(2*sign(alpha)*(sin(alpha)^2)*cos(alpha));
+	CLofalpha = (1-sigma_a)*(BQ.CL0+BQ.CL_alpha*alpha) + sigma_a*(2*sin(alpha)*(sin(alpha)**2)*cos(alpha));
 #	%     CLofalpha = (2*sign(alpha)*(sin(alpha)^2)*cos(alpha));
 
 
 	CL = CLofalpha + BQ.CLq*(q*BQ.c/2*V);
-	CD = BQ.CD_0 + BQ.k*(CL^2) + 1*((sin(alpha))^2);
+	CD = BQ.CD_0 + BQ.k*(CL**2) + 1*((sin(alpha))**2);
 
 	omega_w = Rq2w*omega
 	p_w = omega_w[0,0]
@@ -112,11 +115,13 @@ def forceEstimate(eul,x_dot,omega):
 
 	CY = BQ.CY_beta*beta + BQ.CY_p*(p_w*BQ.b/(2*V)) + BQ.CY_r*(r_w*BQ.b/(2*V));
 
-	L = 0.5*rho*(V^2)*BQ.S*CL 
-	D = 0.5*rho*(V^2)*BQ.S*CD 
-	Y = 0.5*rho*(V^2)*BQ.S*CY 
+	L = 0.5*rho*(V**2)*BQ.S*CL 
+	D = 0.5*rho*(V**2)*BQ.S*CD 
+	Y = 0.5*rho*(V**2)*BQ.S*CY 
 
 	Fa=BQ.wing_n*A*np.array([-D,Y,-L]).T
 	Fa[1,0]=-Fa[1,0]
 	Fa[2,0]=-Fa[2,0]
 	Fa_w = np.array([L,D,Y]).T
+
+	return np.array([ Fa,Fa_w,alpha,beta ] )
