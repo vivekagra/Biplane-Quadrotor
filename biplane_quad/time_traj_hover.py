@@ -6,8 +6,6 @@ def time_traj_hover(t,s):
         z=t
     else:
         z=1
-        
-    
     #z=t;
     x=0
     y=0
@@ -45,5 +43,4 @@ def time_traj_hover(t,s):
             hover_z=s.pos[2]
             hover_x=s.pos[0]
             hover_y=s.pos[1]
-        else:
-            return
+    return des_state

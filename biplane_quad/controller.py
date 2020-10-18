@@ -1,7 +1,8 @@
 from numpy import identity as eye
 from numpy import sin as sin
 from numpy import cos as cos
-
+from utils import eul2rotm
+from aeroFunctions import momentEstimate, forceEstimate
 import globals
 
 class Controller:
@@ -89,14 +90,51 @@ class Controller:
         
         ud = self.des_state.control
         
-        omega_curr=[[1, 0, -sin(self.state.rot(2))], 
-                             [0, cos(self.state.rot(3)), cos(state.rot(2))*sin(state.rot(3))], 
-                             [0, -sin(state.rot(3)), cos(state.rot(2))*cos(state.rot(3))]] * 
-                             [[state.omega(1)], [state.omega(2)], [state.omega(3)]] # check validity
+        omega_curr=[[1, 0, -sin(self.state.rot[1])], 
+                    [0, cos(self.state.rot[2]), cos(state.rot[1])*sin(state.rot[2])], 
+                    [0, -sin(state.rot[2]), cos(state.rot[1])*cos(state.rot[2])]] * [[state.omega[0]], [state.omega[1]], [state.omega[2]]] # check validity
                              
-        omega_des=[[1, 0, -sin(self.des_state.rot(2))], 
-                            [0, cos(self.des_state.rot(3)), cos(self.des_state.rot(2))*sin(self.des_state.rot(3))], 
-                            [0, -sin(des_state.rot(3)), cos(des_state.rot(2))*cos(des_state.rot(3))]] * 
-                            [[des_state.omega(1)], [des_state.omega(2)], [des_state.omega(3)]] # check validity
+        omega_des=[[1, 0, -sin(self.des_state.rot[1])], 
+                            [0, cos(self.des_state.rot[2]), cos(self.des_state.rot[1])*sin(self.des_state.rot[2])], 
+                            [0, -sin(des_state.rot[2]), cos(des_state.rot[1])*cos(des_state.rot[2])]] * [[des_state.omega[0]], [des_state.omega[1]], [des_state.omega[2]]] # check validity
 
+        Rb=eul2rotm([state.rot])
+
+        R=eul2rotm(des_state.rot)
         
+        #Fa=forceEstimate([0 state.rot(2) 0],[state.vel(1);0;state.vel(3)],omega_curr)
+        
+        Fa = forceEstimate([state.rot[0], state.rot[1], state.rot[2]],
+                              [state.vel[0], state.vel[1], state.vel[2]], omega_curr);
+
+        if ud[0]!=0:
+            BQ.g =0
+
+        acc_net=(((R*[ [0], [0], ud[0]]) / BQ.m) + 
+                        kp*[[0], [0], [(des_state.pos[2] - state.pos[2])]] + 
+                        kv*[[(des_state.vel[0] - state.vel[0])], 
+                             [(des_state.vel[1]-state.vel[1])], [(des_state.vel[2]-state.vel[2])]] + 
+                        [[0], [0], [BQ.g]] - ((Rb*Fa)/(BQ.m)))
+
+        # calculation of current euler angles
+        b3 =acc_net/norm(acc_net)
+        c2 = np.transpose([-sin(des_state.rot[2]), cos(des_state.rot[2]), 0])
+        b1 = np.cross(c2,b3)/norm(np.cross(c2,b3))
+        b2 = np.cross(b3,b1)
+        Rd = [b1, b2, b3]
+        
+        # thrust control input
+                  
+        F = BQ.m*acc_net[2]           
+        
+        R = eul2rotm(state.rot)
+        erm = 0.5*((np.transpose(Rd)*R) - (np.transpose(R)*Rd))
+        er = [[erm[2,1], [erm[0,2]], [erm[1,0]]]]
+        ew = (omega_curr-((np.transpose(R)*Rd)*omega_des))
+        
+        tau_a=momentEstimate([state.rot[0], state.rot[1], state.rot[2]], 
+                                             [[state.vel[0], state.vel[1], state.vel[2]]], omega_curr, Fa)
+        
+        # tau_a=momentEstimate([0; state.rot(2); 0],[state.vel(1);0;state.vel(3)],omega_curr, Fa);
+        # tau_a=[0;0;0]
+        M=[[0], [ud(2)], [0]] - kr*er - kw*ew + np.cross(omega_curr,BQ.J * omega_curr) - BQ.J*np.cross(ew,(np.transpose(R)*Rd)*omega_des)-tau_a    # moment input
