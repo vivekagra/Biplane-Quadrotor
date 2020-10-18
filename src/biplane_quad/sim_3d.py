@@ -46,14 +46,12 @@ def sim_3d(trajhandle, controlhandle):
     des_psidot=zeros(max_iter*nstep, 1);
 
     x       = x0;    #    % state
-
-
     #%% ************************* RUN SIMULATION *************************
     print('Simulation Running....');
     # % Main loop
     for iter in range(1,max_iter):
 
-        timeint = time:tstep:time+cstep;
+        timeint = time:tstep:time +cstep;
         
         # %tic;
         # % Run simulation
