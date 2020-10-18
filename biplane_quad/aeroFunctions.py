@@ -119,7 +119,10 @@ def forceEstimate(eul,x_dot,omega):
 	D = 0.5*rho*(V**2)*BQ.S*CD 
 	Y = 0.5*rho*(V**2)*BQ.S*CY 
 
-	Fa=BQ.wing_n*A*np.array([-D,Y,-L]).T
+	print("Fahere", Fa)
+	print("A", A)
+	Fa=BQ.wing_n*A*(np.array([-D,Y,-L]).T)
+	print("Fahere", Fa)
 	Fa[1,0]=-Fa[1,0]
 	Fa[2,0]=-Fa[2,0]
 	Fa_w = np.array([L,D,Y]).T

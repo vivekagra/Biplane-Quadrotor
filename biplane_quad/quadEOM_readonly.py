@@ -5,6 +5,7 @@ from numpy import zeros as zeros
 from numpy import cross as cross
 from numpy import cos as cos
 import numpy as np
+
 def quadEOM_readonly(t, s, F, Fa, M, tau_a, BQ):
 
     # % QUADEOM_READONLY Solve quadrotor equation of motion
@@ -42,7 +43,7 @@ def quadEOM_readonly(t, s, F, Fa, M, tau_a, BQ):
     R = eul2rotm([phic,thetac,psic])
     
     #FIXED TILL HERE
-    print(Fa)
+    print("Fa", Fa)
     accel = (R*([0,0,F]+Fa)/BQ.m)-[0, 0, BQ.g]
     print("accel", accel)
     # % Angular acceleration

@@ -104,8 +104,8 @@ class Controller:
         R=np.array(eul2rotm(self.des_state.rot))
         
         #Fa=forceEstimate([0 state.rot(2) 0],[state.vel(1);0;state.vel(3)],omega_curr)
-        
-        [ Fa,Fa_w,alpha,beta ] = forceEstimate(np.array([self.state.rot[0], self.state.rot[1], self.state.rot[2]]),
+        # [ Fa,Fa_w,alpha,beta ] 
+        Fa = forceEstimate(np.array([self.state.rot[0], self.state.rot[1], self.state.rot[2]]),
                               np.array([self.state.vel[0], self.state.vel[1], self.state.vel[2]]), omega_curr);
 
         print("Fa", Fa)

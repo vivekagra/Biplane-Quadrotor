@@ -2,6 +2,8 @@ import numpy as np
 from numpy import sin
 from numpy import cos
 
+def debug(variable):
+    print variable, '=', repr(eval(variable))
 
 """ traj_=[
             0.00000000000000, 2.38979695502618, 4.77382734355769, 7.14528763663408,
@@ -81,7 +83,6 @@ class Qd:
 
 def stateToQd(x):
 	qd = Qd()
-	print(x)
 	qd.pos = x[0:3]
 	qd.vel = x[3:6]
 	qd.rot = x[6:9]
