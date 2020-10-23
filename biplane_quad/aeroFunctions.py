@@ -12,7 +12,7 @@ def momentEstimate(eul, x_dot, omega, Fa):
 	Moment_aero=(np.zeros(3)).T
 	R=np.array(eul2rotm(eul))
 	x_dot = np.array(x_dot).T
-	print(R, x_dot)
+	print('test momEST',R, x_dot)
 	xb_dot=np.dot(R.T,x_dot);
 	V=np.linalg.norm(x_dot);
 
@@ -65,13 +65,16 @@ def forceEstimate(eul,x_dot,omega):
 	Fa_w=np.array([0,0,0])
 	alpha=0
 	beta=0
-	p=omega[0,0];
-	q=omega[1,0];
-	r=omega[2,0];
-	rho=1.225;
+	p=omega[0,0]
+	q=omega[1,0]
+	r=omega[2,0]
+	rho=1.225
 	R=np.array(eul2rotm(eul))
-	xb_dot=np.dot(R.T,x_dot);
-	V=np.linalg.norm(x_dot);
+	xb_dot=np.dot(R.T,x_dot)
+	V=np.linalg.norm(x_dot)
+    
+    
+    ######## v==0 
 
 	Rq2w = np.array([
 	    [0, 0, 1],
@@ -79,30 +82,30 @@ def forceEstimate(eul,x_dot,omega):
 	    [-1, 0, 0]])
 	xw_dot = np.dot(Rq2w,xb_dot)
 
-	#% alpha=atan2(-xw_dot(3),xw_dot(1));
-	#% beta=atan2(xw_dot(2),xw_dot(1));
+	#alpha=atan2(-xw_dot(3),xw_dot(1));
+	#beta=atan2(xw_dot(2),xw_dot(1));
 
 	if (xw_dot[0]!=0):
-	    alpha=atan2(-xw_dot[2],xw_dot[0]);
-	    beta=atan2(xw_dot[1],xw_dot[0]);
+	    alpha=atan2(-xw_dot[2],xw_dot[0])
+	    beta=atan2(xw_dot[1],xw_dot[0])
 	else:
 	    alpha=0;
 	    beta=0;
-#	% alpha=atan2(xb_dot(1),xb_dot(3));
-	#% beta=atan2(xb_dot(2),xb_dot(3));
+    # alpha=atan2(xb_dot(1),xb_dot(3));
+	# beta=atan2(xb_dot(2),xb_dot(3));
 
-#	% alpha = abs(alpha);
-#	% beta = abs(beta);
+    # alpha = abs(alpha);
+    # beta = abs(beta);
 
-	A=np.array([[sin(alpha)*cos(beta),   -sin(alpha)*sin(beta), cos(alpha)],
+	A = np.array([[sin(alpha)*cos(beta),   -sin(alpha)*sin(beta), cos(alpha)],
                [sin(beta)           , cos(beta)                ,0       ],
 	           [-cos(alpha)*cos(beta),   cos(alpha)*sin(beta),     sin(alpha)]])
 
-	sigma_a = (1 + exp(-BQ.M*(alpha-BQ.alpha0)) + exp(BQ.M*(alpha+BQ.alpha0)))/(( 1 + exp(-BQ.M*(alpha-BQ.alpha0)))*(1 + exp(BQ.M*(alpha+BQ.alpha0))));
+	sigma_a = (1 + exp(-BQ.M*(alpha-BQ.alpha0)) + exp(BQ.M*(alpha+BQ.alpha0)))/(( 1 + exp(-BQ.M*(alpha-BQ.alpha0)))*(1 + exp(BQ.M*(alpha+BQ.alpha0))))
 
 
 	CLofalpha = (1-sigma_a)*(BQ.CL0+BQ.CL_alpha*alpha) + sigma_a*(2*sin(alpha)*(sin(alpha)**2)*cos(alpha));
-#	%     CLofalpha = (2*sign(alpha)*(sin(alpha)^2)*cos(alpha));
+    #CLofalpha = (2*sign(alpha)*(sin(alpha)^2)*cos(alpha));
 
 
 	CL = CLofalpha + BQ.CLq*(q*BQ.c/2*V);
@@ -119,12 +122,12 @@ def forceEstimate(eul,x_dot,omega):
 	D = 0.5*rho*(V**2)*BQ.S*CD 
 	Y = 0.5*rho*(V**2)*BQ.S*CY 
 
-	print("Fahere", Fa)
-	print("A", A)
-	Fa=BQ.wing_n*A*(np.array([-D,Y,-L]).T)
-	print("Fahere", Fa)
-	Fa[1,0]=-Fa[1,0]
-	Fa[2,0]=-Fa[2,0]
-	Fa_w = np.array([L,D,Y]).T
+	#print("Fahere", Fa)
+	#print("A", A)
+	Fa=BQ.wing_n*A.dot(np.array([-D,Y,-L]))
+	#print("Fahere", Fa)
+	Fa[1]=-Fa[1]
+	Fa[2]=-Fa[2]
+	Fa_w = np.array([L,D,Y])
 
-	return np.array([ Fa,Fa_w,alpha,beta ] )
+	return Fa, Fa_w, alpha, beta

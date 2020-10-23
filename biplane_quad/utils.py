@@ -2,8 +2,6 @@ import numpy as np
 from numpy import sin
 from numpy import cos
 
-def debug(variable):
-    print variable, '=', repr(eval(variable))
 
 """ traj_=[
             0.00000000000000, 2.38979695502618, 4.77382734355769, 7.14528763663408,
