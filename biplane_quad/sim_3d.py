@@ -7,8 +7,11 @@ from quadEOM import quadEOM
 import numpy as np
 global t,s
 
+#quick fix for matlab
+end=-1
+
 def sim_3d(trajhandle, controlhandle):
-    max_time = 10; #6
+    max_time = 10000; #6
     #% parameters for simulation
     BQ = systemParameters()
     # *********************** INITIAL CONDITIONS ***********************
@@ -17,15 +20,14 @@ def sim_3d(trajhandle, controlhandle):
     tstep    = 0.01#; % this determines the time step at which the solution is given%0.02
     cstep    = 0.04#; % image capture time interval 0.06
     max_iter = max_time/cstep#; % max iteration
-    nstep    = cstep/tstep#;
+    nstep    = int(cstep/tstep)#;
     time     = 0#; % current time
     # % Get start position
-    des_start = trajhandle(0, []);
-    x0    = init_state(des_start.pos,des_start.vel,des_start.rot,des_start.omega);
+    # des_start = trajhandle(0, []);
+    # x0    = init_state(des_start.pos,des_start.vel,des_start.rot,des_start.omega);
 
-    #%x0(9)=1.6;
     store_shape = int(max_iter*nstep)
-    xtraj = np.zeros((store_shape, len(x0)));
+    xtraj = np.zeros((store_shape, 12));
     ttraj = np.zeros(store_shape);
     des_x = np.zeros(store_shape);
     des_z = np.zeros(store_shape);
@@ -52,7 +54,9 @@ def sim_3d(trajhandle, controlhandle):
     des_psidot=np.zeros(store_shape);
     
     des_start = trajhandle(0, []);
-    x0    = init_state(des_start.pos,des_start.vel,des_start.rot,des_start.omega);
+    x0    = init_state(des_start.pos,des_start.vel,des_start.rot,des_start.omega);   
+    x0[4]=1.6;
+
     t = 0
 
     #%% ************************* RUN SIMULATION *************************
@@ -70,11 +74,12 @@ def sim_3d(trajhandle, controlhandle):
         results = solve_ivp(lambda t,y: quadEOM(t, y, controlhandle, trajhandle, BQ), (time, time+cstep), x0, t_eval=timeint)
         print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
         print(results.t, results.y)
-        x    = xsave[end, :].T
-       
+        xsave = results.y
+        x    = results.y[end, :].T
+        print(xsave)
         # Save to traj
-        xtraj[(iter-1)*nstep:iter*nstep,:] = xsave[0:end-1,:];
-        ttraj[(iter-1)*nstep:iter*nstep] = tsave[0:end-1];
+        xtraj[(iter-1)*nstep:iter*nstep,:] = xsave[0:-1,:];
+        ttraj[(iter-1)*nstep:iter*nstep] = tsave[0:-1];
         break
         
         for i in range(1,nstep+1):
