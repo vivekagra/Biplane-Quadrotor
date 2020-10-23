@@ -53,25 +53,29 @@ def sim_3d(trajhandle, controlhandle):
     
     des_start = trajhandle(0, []);
     x0    = init_state(des_start.pos,des_start.vel,des_start.rot,des_start.omega);
-    x = x0;    #    % state
     t = 0
 
     #%% ************************* RUN SIMULATION *************************
     print('Simulation Running....');
+
     # % Main loop
     for iter in range(1,int(max_iter)):
 
         # timeint = time:tstep:time +cstep;
         timeint = np.arange(time, time+cstep, tstep)
+        print(timeint)
         ##lambda t,y: rhs_2nd_order_ode(t,y,a,b)
         ##Since we cannot pass the variable scorrecty into it,
-        [tsave, xsave] = solve_ivp(lambda t,y: quadEOM(t, y, controlhandle, trajhandle, BQ), timeint, x)
+        #[tsave, xsave] =
+        results = solve_ivp(lambda t,y: quadEOM(t, y, controlhandle, trajhandle, BQ), (time, time+cstep), x0, t_eval=timeint)
+        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+        print(results.t, results.y)
         x    = xsave[end, :].T
        
         # Save to traj
         xtraj[(iter-1)*nstep:iter*nstep,:] = xsave[0:end-1,:];
         ttraj[(iter-1)*nstep:iter*nstep] = tsave[0:end-1];
-
+        break
         
         for i in range(1,nstep+1):
     # %         if (flag ==1)
@@ -147,7 +151,7 @@ def sim_3d(trajhandle, controlhandle):
             taux[(iter-1)*nstep+i]=tau_a1[0];
             tauy[(iter-1)*nstep+i]=tau_a1[1];
             tauz[(iter-1)*nstep+i]=tau_a1[2];
-
+        break
         time = time + cstep; #% Update simulation time
         
       #  %t = toc;

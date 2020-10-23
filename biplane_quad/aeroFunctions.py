@@ -13,7 +13,7 @@ def momentEstimate(eul, x_dot, omega, Fa):
 	Moment_aero=(np.zeros(3)).T
 	R=np.array(eul2rotm(eul))
 	x_dot = np.array(x_dot).T
-	print('test momEST',R, x_dot)
+	# print('test momEST',R, x_dot)
 	xb_dot=np.dot(R.T,x_dot);
 	V=np.linalg.norm(x_dot);
 

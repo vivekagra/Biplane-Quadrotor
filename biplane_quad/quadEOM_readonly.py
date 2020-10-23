@@ -56,22 +56,22 @@ def quadEOM_readonly(t, s, F, Fa, M, tau_a, BQ):
                        [0, -sin(phic), cos(phic)*cos(thetac)]])
     Omega=np.dot(A,Eul_dot);
     # resetting columns
-    print(M, tau_a)
+    # print(M, tau_a)
     M = np.array([M[0][0], M[1][0], M[2][0]]);
-    print("M", M)
-    print("tau_a", tau_a)
-    print("----", cross(Omega.T,(np.dot(BQ.J,Omega)).T).T)
-    print("555", (M + tau_a-cross(Omega.T,np.dot(BQ.J, Omega).T)))
+    # print("M", M)
+    # print("tau_a", tau_a)
+    # print("----", cross(Omega.T,(np.dot(BQ.J,Omega)).T).T)
+    # print("555", (M + tau_a-cross(Omega.T,np.dot(BQ.J, Omega).T)))
     Omega_dot   = np.linalg.solve(BQ.J,(M + tau_a-cross(Omega.T,np.dot(BQ.J,Omega).T)).T)
-    print('Omega_dot',Omega_dot)
+    # print('Omega_dot',Omega_dot)
     B= np.array([[0, 0, cos(thetac)*Eul_dot[1]],
                         [0, sin(phic)*Eul_dot[0], -sin(phic)*sin(thetac)*Eul_dot[1]-cos(phic)*cos(thetac)*Eul_dot[0]],
                         [0,cos(phic)*Eul_dot[0], -sin(thetac)*cos(phic)*Eul_dot[1]+sin(phic)*cos(thetac)*Eul_dot[0]]])
 
 
-    print('Eulddot',Eul_dot)
+    # print('Eulddot',Eul_dot)
     eulddot= np.linalg.solve(A,Omega_dot-B.dot(Eul_dot))
-    print('eulddot',eulddot)
+    # print('eulddot',eulddot)
     # eulddot   = (BQ.J)\(M+tau_a)
     # Assemble sdot
     sdot = zeros(12)
