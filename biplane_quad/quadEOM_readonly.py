@@ -55,8 +55,14 @@ def quadEOM_readonly(t, s, F, Fa, M, tau_a, BQ):
                        [0, cos(phic), sin(phic)*cos(thetac)],
                        [0, -sin(phic), cos(phic)*cos(thetac)]])
     Omega=np.dot(A,Eul_dot);
+    # resetting columns
     print(M, tau_a)
-    Omega_dot   = np.linalg.solve(BQ.J,(M + tau_a-cross(Omega.T,(BQ.J*Omega).T).T))
+    M = np.array([M[0][0], M[1][0], M[2][0]]);
+    print("M", M)
+    print("tau_a", tau_a)
+    print("----", cross(Omega.T,(np.dot(BQ.J,Omega)).T).T)
+    print("555", (M + tau_a-cross(Omega.T,np.dot(BQ.J, Omega).T)))
+    Omega_dot   = np.linalg.solve(BQ.J,(M + tau_a-cross(Omega.T,np.dot(BQ.J,Omega).T)).T)
     print('Omega_dot',Omega_dot)
     B= np.array([[0, 0, cos(thetac)*Eul_dot[1]],
                         [0, sin(phic)*Eul_dot[0], -sin(phic)*sin(thetac)*Eul_dot[1]-cos(phic)*cos(thetac)*Eul_dot[0]],

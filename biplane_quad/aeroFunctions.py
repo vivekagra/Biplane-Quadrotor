@@ -3,6 +3,7 @@ import numpy as np
 from numpy import sin as sin
 from numpy import cos as cos
 from numpy import exp as exp
+from numpy import arctan2 as atan2
 
 from utils import eul2rotm
 
@@ -25,9 +26,9 @@ def momentEstimate(eul, x_dot, omega, Fa):
 	    [-1, 0, 0]])
 	xw_dot = np.dot(Rq2w, xb_dot)
 
-	if (xw_dot(0)!=0):
-	    alpha=np.arctan2(-xw_dot(2),xw_dot(0))
-	    beta=np.arctan2(xw_dot(1),xw_dot(0))
+	if (xw_dot[0]!=0):
+	    alpha=np.arctan2(-xw_dot[2],xw_dot[0])
+	    beta=np.arctan2(xw_dot[1],xw_dot[0])
 	else:
 	    alpha=0
 	    beta=0	
@@ -41,9 +42,9 @@ def momentEstimate(eul, x_dot, omega, Fa):
 	C_m = BQ.Cm_0 + BQ.Cm_alpha*alpha + BQ.Cm_q*q_w*BQ.c/(2*V);
 	C_n = BQ.Cn_beta*beta + BQ.Cn_p*p_w*BQ.b/(2*V) + BQ.Cn_r*r_w*BQ.b/(2*V);
 
-	Mx_w_ac = 0.5*rho*(V^2)*BQ.S*BQ.c*C_l ;
-	My_w_ac = 0.5*rho*(V^2)*BQ.S*BQ.c*C_m ;
-	Mz_w_ac = 0.5*rho*(V^2)*BQ.S*BQ.c*C_n ;
+	Mx_w_ac = 0.5*rho*(V**2)*BQ.S*BQ.c*C_l ;
+	My_w_ac = 0.5*rho*(V**2)*BQ.S*BQ.c*C_m ;
+	Mz_w_ac = 0.5*rho*(V**2)*BQ.S*BQ.c*C_n ;
 
 	M_ac = np.array([
 		Mx_w_ac,
@@ -51,12 +52,12 @@ def momentEstimate(eul, x_dot, omega, Fa):
 		Mz_w_ac])#;% wing frame
 	# % r = BQ.x_ac - BQ.x_cg;
 	# % M_cg = M_ac + cross(r',(Rq2w*Fa)')';
-	# r = BQ.x_ac(1) - BQ.x_cg(1);
+	r = BQ.x_ac[0] - BQ.x_cg[0];
 	# % L = -Fa(1);
 	# % M_cg = M_ac + [0;r*L;0]; % wing frame
 
 	# % Moment_aero = BQ.wing_n*Rq2w'*M_cg; % body frame
-	Moment_aero = np.array([0,BQ.wing_n*My_w_ac+r*Fa(1),0]).T
+	Moment_aero = np.array([0,BQ.wing_n*My_w_ac+r*Fa[0],0]).T
 
 
 def forceEstimate(eul,x_dot,omega):

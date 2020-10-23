@@ -8,7 +8,7 @@ from time_traj_fortrans import time_traj_fortrans
 from time_traj_land import time_traj_land
 from time_traj_cruise import time_traj_cruise
 
-def quadEOM(controlhandle, trajhandle, BQ):
+def quadEOM(t, s, controlhandle, trajhandle, BQ):
 # % QUADEOM Wrapper function for solving quadrotor equation of motion
 # % 	quadEOM takes in time, state vector, controller, trajectory generator
 # % 	and parameters and output the derivative of the state vector, the

@@ -63,8 +63,9 @@ def sim_3d(trajhandle, controlhandle):
 
         # timeint = time:tstep:time +cstep;
         timeint = np.arange(time, time+cstep, tstep)
-    
-        [tsave, xsave] = solve_ivp(quadEOM(controlhandle, trajhandle, BQ), timeint, x)
+        ##lambda t,y: rhs_2nd_order_ode(t,y,a,b)
+        ##Since we cannot pass the variable scorrecty into it,
+        [tsave, xsave] = solve_ivp(lambda t,y: quadEOM(t, y, controlhandle, trajhandle, BQ), timeint, x)
         x    = xsave[end, :].T
        
         # Save to traj
