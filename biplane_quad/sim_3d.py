@@ -66,19 +66,22 @@ def sim_3d(trajhandle, controlhandle):
     for iter in range(1,int(max_iter)):
 
         # timeint = time:tstep:time +cstep;
-        timeint = np.arange(time, time+cstep, tstep)
-        print(timeint)
+        timeint = np.arange(time, time+cstep+tstep/10, tstep)
+        #print('time', timeint)
         ##lambda t,y: rhs_2nd_order_ode(t,y,a,b)
         ##Since we cannot pass the variable scorrecty into it,
         #[tsave, xsave] =
         results = solve_ivp(lambda t,y: quadEOM(t, y, controlhandle, trajhandle, BQ), (time, time+cstep), x0, t_eval=timeint)
-        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-        print(results.t, results.y)
+        #print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+        #print(results.t, results.y)
         xsave = results.y
-        x    = results.y[end, :].T
-        print(xsave)
+        tsave = results.t
+        #x    = results.y[end, :].T
+        
+        #print('xsave', xsave.shape)
+        #print('xtraj', xtraj.shape)
         # Save to traj
-        xtraj[(iter-1)*nstep:iter*nstep,:] = xsave[0:-1,:];
+        xtraj[(iter-1)*nstep:iter*nstep,:] = (xsave.T)[0:-1,:];
         ttraj[(iter-1)*nstep:iter*nstep] = tsave[0:-1];
         break
         
