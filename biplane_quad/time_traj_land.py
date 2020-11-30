@@ -1,5 +1,6 @@
 from globals import backt_t, backt_z, max_time
 from utils import desired_state
+import numpy as np
 
 def time_traj_land(t):
     # t1=t-backt_t
@@ -29,11 +30,11 @@ def time_traj_land(t):
         z=0
     
     des_state = desired_state()
-    des_state.pos = [[x], [y], [z]]
-    des_state.vel = [[xdot], [ydot], [zdot]]
-    des_state.acc = [[xddot], [yddot], [zddot]]
-    des_state.rot=[[phid], [thetad], [psid]]
-    des_state.omega=[[phidot_des], [thetadot_des], [psidot_des]]
-    des_state.control=[[Tfwd], [Mfwd]]
+    des_state.pos = np.array([x, y, z])
+    des_state.vel = np.array([xdot, ydot, zdot])
+    des_state.acc = np.array([xddot, yddot, zddot])
+    des_state.rot = np.array([phid, thetad, psid])
+    des_state.omega = np.array([phidot_des, thetadot_des, psidot_des])
+    des_state.control = np.array([Tfwd, Mfwd])
     
     return des_state

@@ -1,4 +1,4 @@
-from biplane_quad.globals import flag as flag
+from globals import flag
 import numpy as np
 
 """traj=[
@@ -39,17 +39,12 @@ def traj_gen(traj,traj_dot):
     for i in range(N-1):
         t0 = (i)*Tf/(N-1)
         tf = (i+1)*Tf/(N-1);
-        M  = [[1, t0, t0**2, t0**3],
+        M  = np.array([[1, t0, t0**2, t0**3],
                  [1, tf,  tf**2,  tf**3],
                  [0, 1,  2*t0,   3*(t0**2)],
-                 [0, 1,  2*tf,    3*tf**2]]
-        M = np.array(M)
+                 [0, 1,  2*tf,    3*tf**2]])
         
-        b = [[traj[i]],
-                [traj[i+1]],
-                [traj_dot[i]],
-                [traj_dot[i+1]]]
-        b  = np.array(b)
+        b = np.array([traj[i], traj[i+1], traj_dot[i], traj_dot[i+1]])
         
         A = np.linalg.lstsq(M,b,rcond = None)[0] 
         

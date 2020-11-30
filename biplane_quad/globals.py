@@ -10,9 +10,16 @@ s=np.zeros(12)
 global flag
 flag = 0
 
+global Rd
+Rd = 0
+
 global backt_t
+global backt_x
+global backt_y
 global backt_z
 backt_t = 0
+backt_x = 0
+backt_y = 0
 backt_z = 0
 
 global cruise_t

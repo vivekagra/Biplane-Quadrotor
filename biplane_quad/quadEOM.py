@@ -1,6 +1,5 @@
 from globals import flag, hover_t, hover_z, hover_x, hover_y
 from quadEOM_readonly import quadEOM_readonly
-# import globals
 from utils import stateToQd
 from time_traj_hover import time_traj_hover
 from time_traj_fortrans import time_traj_fortrans
@@ -23,9 +22,8 @@ def quadEOM(t, state, controlhandle, trajhandle, BQ):
 # % OUTPUTS:
 # % sdot          - 12 x 1, derivative of state vector s
 
-# % convert state to quad stuct for control
+# convert state to quad stuct for control
 # global flag hover_x hover_y hover_z fort_x fort_y fort_z backt_t cruise_z cruise_x cruise_y backt_x backt_y backt_z
-    # print("Original S", state)
     s = state
     current_state = stateToQd(s);
     if (flag ==1):
@@ -39,7 +37,7 @@ def quadEOM(t, state, controlhandle, trajhandle, BQ):
     elif (flag == 5):
         trajhandle = time_traj_land;
     
-    # % Get desired_state
+    # Get desired_state
     desired_state = trajhandle(t, current_state);
     
     if (flag ==2):
@@ -60,14 +58,8 @@ def quadEOM(t, state, controlhandle, trajhandle, BQ):
         desired_state.pos[1]=desired_state.pos[1]+backt_y;
         desired_state.pos[2]=desired_state.pos[2];
     
-    # % get control outputs
-    c = controlhandle(t, current_state, desired_state, BQ)
-    [F, Fa, M, tau_a] = c.run()
-
-    # print(tau_a)
-    # print("QUADEOM RUN KARENGEEE")
-    # % compute derivative
+    # get control outputs
+    [F, Fa, M, tau_a] = controlhandle(t, current_state, desired_state, BQ)
+     
     sdot = quadEOM_readonly(t, s, F, Fa, M, tau_a, BQ);
-    # print("asgsagfsgdgsdg RUN KARENGEEE")
-    # print("New S", s)
     return sdot

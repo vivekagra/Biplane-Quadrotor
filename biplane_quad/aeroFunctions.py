@@ -58,10 +58,10 @@ def momentEstimate(eul, x_dot, omega, Fa):
 
 	# % Moment_aero = BQ.wing_n*Rq2w'*M_cg; % body frame
 	Moment_aero = np.array([0,BQ.wing_n*My_w_ac+r*Fa[0],0]).T
-
+    
 
 def forceEstimate(eul,x_dot,omega):
-	print("x_dot", x_dot)
+	#print("x_dot", x_dot)
 	BQ = systemParameters();
 	Fa=np.array([0,0,0])
 	Fa_w=np.array([0,0,0])
@@ -112,12 +112,12 @@ def forceEstimate(eul,x_dot,omega):
 
 	CL = CLofalpha + BQ.CLq*(q*BQ.c/2*V);
 	CD = BQ.CD_0 + BQ.k*(CL**2) + 1*((sin(alpha))**2);
-	print(V)
+	#print(V)
 	omega_w = Rq2w*omega
 	p_w = omega_w[0,0]
 	q_w = omega_w[1,0]
 	r_w = omega_w[2,0]
-	print(omega_w, p_w, q_w, r_w)
+	#print(omega_w, p_w, q_w, r_w)
 	CY = BQ.CY_beta*beta + BQ.CY_p*(p_w*BQ.b/(2*V)) + BQ.CY_r*(r_w*BQ.b/(2*V));
 
 	L = 0.5*rho*(V**2)*BQ.S*CL 
